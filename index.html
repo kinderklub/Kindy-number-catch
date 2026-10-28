@@ -1,0 +1,1778 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Tangkap Nombor - Kinder Klub</title>
+
+  <!-- Google Font: Quicksand (QuickSans Mandate) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --font-main: 'Quicksand', 'QuickSans', sans-serif;
+      --primary-yellow: #FFD166;
+      --primary-green: #06D6A0;
+      --deep-forest: #064E3B;
+      --sky-blue: #0284C7;
+      --warm-pink: #EF476F;
+    }
+
+    *, *::before, *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: var(--font-main) !important;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background-color: #0b4f40;
+    }
+
+    /* Core Application Shell (Fill 100dvh) */
+    #game-shell {
+      position: relative;
+      width: 100%;
+      height: 100dvh;
+      min-height: 100dvh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Full-Screen Continuous Animated SVG Layer */
+    #full-screen-background {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    #full-screen-background svg {
+      display: block;
+      width: 100%;
+      height: 100%;
+      min-width: 100%;
+      min-height: 100%;
+    }
+
+    /* Atmospheric Vignette Overlay */
+    #environment-foreground {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 2;
+      pointer-events: none;
+      background: radial-gradient(circle at 50% 25%, rgba(255, 255, 255, 0.06) 0%, rgba(2, 44, 34, 0.22) 100%);
+    }
+
+    /* Primary Interactive Layer */
+    #game-content {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      overflow: hidden;
+    }
+
+    /* Navigation Bar */
+    .top-bar {
+      position: relative;
+      z-index: 35;
+      width: 100%;
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+    }
+
+    /* Chunky Tactile 3D Buttons for Preschoolers */
+    .btn-3d {
+      border: none;
+      outline: none;
+      cursor: pointer;
+      font-weight: 800;
+      border-radius: 20px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: transform 0.12s ease, box-shadow 0.12s ease, background-color 0.2s ease;
+      touch-action: manipulation;
+    }
+
+    .btn-3d:active {
+      transform: translateY(4px);
+    }
+
+    .btn-yellow {
+      background: linear-gradient(180deg, #FFE066 0%, #F59E0B 100%);
+      color: #78350F;
+      border: 3px solid #D97706;
+      box-shadow: 0 6px 0 #B45309, 0 10px 16px rgba(0, 0, 0, 0.25);
+    }
+    .btn-yellow:active {
+      box-shadow: 0 2px 0 #B45309;
+    }
+
+    .btn-green {
+      background: linear-gradient(180deg, #6EE7B7 0%, #10B981 100%);
+      color: #FFFFFF;
+      border: 3px solid #047857;
+      text-shadow: 0 2px 4px rgba(6, 78, 59, 0.6);
+      box-shadow: 0 6px 0 #065F46, 0 10px 16px rgba(0, 0, 0, 0.25);
+    }
+    .btn-green:active {
+      box-shadow: 0 2px 0 #065F46;
+    }
+
+    .btn-blue {
+      background: linear-gradient(180deg, #7DD3FC 0%, #0284C7 100%);
+      color: #FFFFFF;
+      border: 3px solid #0369A1;
+      text-shadow: 0 2px 4px rgba(12, 74, 110, 0.6);
+      box-shadow: 0 6px 0 #075985, 0 10px 16px rgba(0, 0, 0, 0.25);
+    }
+    .btn-blue:active {
+      box-shadow: 0 2px 0 #075985;
+    }
+
+    /* Rounded Translucent Glass Panels */
+    .glass-card {
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 3px solid rgba(255, 255, 255, 0.95);
+      border-radius: 28px;
+      box-shadow: 0 16px 36px rgba(2, 44, 34, 0.32), inset 0 2px 6px rgba(255, 255, 255, 0.9);
+    }
+
+    /* Screen Transitions */
+    .screen {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      padding: 56px 14px 10px 14px;
+      opacity: 1;
+      visibility: visible;
+      transition: opacity 0.24s ease, transform 0.24s ease;
+      z-index: 15;
+      overflow-y: auto;
+      overflow-x: hidden;
+    }
+
+    .screen.hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transform: scale(0.96);
+    }
+
+    /* Interactive Gameplay Arena */
+    #play-arena {
+      position: relative;
+      width: 100%;
+      flex: 1;
+      overflow: hidden;
+      touch-action: manipulation;
+    }
+
+    /* Moving Number Targets (Touch targets >= 76px) */
+    .moving-target {
+      position: absolute;
+      width: 76px;
+      height: 76px;
+      border-radius: 9999px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.3rem;
+      font-weight: 800;
+      cursor: pointer;
+      touch-action: manipulation;
+      z-index: 25;
+      box-shadow: 0 10px 22px rgba(0, 0, 0, 0.26), inset 0 3px 6px rgba(255, 255, 255, 0.7);
+      transition: transform 0.08s ease;
+      will-change: transform;
+    }
+
+    .moving-target:active {
+      transform: scale(0.92) !important;
+    }
+
+    /* 5 Rotating Visual Variations */
+    .var-bubble {
+      background: radial-gradient(circle at 35% 30%, #E0F7FA 0%, #4DD0E1 45%, #0097A7 100%);
+      border: 4px solid #B2EBF2;
+      color: #004D40;
+      text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
+    }
+
+    .var-balloon {
+      background: radial-gradient(circle at 35% 30%, #FFE4E6 0%, #FB7185 55%, #E11D48 100%);
+      border: 4px solid #FECDD3;
+      color: #FFFFFF;
+      text-shadow: 0 2px 4px rgba(159, 18, 57, 0.7);
+    }
+
+    .var-star {
+      background: radial-gradient(circle at 35% 30%, #FEF9C3 0%, #FBBF24 55%, #D97706 100%);
+      border: 4px solid #FEF08A;
+      color: #78350F;
+      text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
+    }
+
+    .var-jelly {
+      background: radial-gradient(circle at 35% 30%, #DCFCE7 0%, #34D399 55%, #059669 100%);
+      border: 4px solid #A7F3D0;
+      border-radius: 26px !important;
+      color: #064E3B;
+      text-shadow: 0 1px 2px rgba(255, 255, 255, 0.7);
+    }
+
+    .var-droplet {
+      background: radial-gradient(circle at 35% 30%, #E0E7FF 0%, #818CF8 55%, #4F46E5 100%);
+      border: 4px solid #C7D2FE;
+      color: #FFFFFF;
+      text-shadow: 0 2px 4px rgba(49, 46, 129, 0.7);
+    }
+
+    /* Animations */
+    @keyframes wiggle-soft {
+      0%, 100% { transform: translateX(0); }
+      20% { transform: translateX(-10px) rotate(-6deg); }
+      40% { transform: translateX(10px) rotate(6deg); }
+      60% { transform: translateX(-6px) rotate(-3deg); }
+      80% { transform: translateX(6px) rotate(3deg); }
+    }
+    .wiggle-effect {
+      animation: wiggle-soft 0.4s ease-in-out;
+    }
+
+    @keyframes catch-burst {
+      0% { transform: scale(1); opacity: 1; }
+      40% { transform: scale(1.4) rotate(12deg); opacity: 1; }
+      100% { transform: scale(0.2) translateY(-100px); opacity: 0; }
+    }
+    .catch-effect {
+      animation: catch-burst 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    }
+
+    @keyframes gentle-bob {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-7px) rotate(2deg); }
+    }
+    .mascot-bob {
+      animation: gentle-bob 3.2s ease-in-out infinite;
+    }
+
+    @keyframes frog-blink {
+      0%, 92%, 100% { transform: scaleY(1); }
+      96% { transform: scaleY(0.08); }
+    }
+    .eye-blink {
+      transform-origin: center;
+      animation: frog-blink 4.2s infinite;
+    }
+
+    @keyframes frog-arm-wave {
+      0%, 100% { transform: rotate(0deg); }
+      25% { transform: rotate(-18deg); }
+      75% { transform: rotate(14deg); }
+    }
+    .arm-wave {
+      transform-origin: 32px 64px;
+      animation: frog-arm-wave 1.5s ease-in-out infinite;
+    }
+
+    /* Drag Matching Bonus Lines */
+    #bonus-lines-svg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 20;
+    }
+
+    .snap-line {
+      stroke: #10B981;
+      stroke-width: 6;
+      stroke-linecap: round;
+      filter: drop-shadow(0 2px 6px rgba(16, 185, 129, 0.7));
+    }
+
+    /* Fixed Immutable Footer */
+    .game-footer {
+      width: 100%;
+      text-align: center;
+      padding: 6px 12px;
+      font-size: 0.72rem;
+      font-weight: 800;
+      color: rgba(255, 255, 255, 0.9);
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.65);
+      flex-shrink: 0;
+      z-index: 30;
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="game-shell">
+
+    <!-- 1. REAL EMBEDDED ANIMATED SVG BACKGROUND (1440 x 900 Full-Coverage) -->
+    <div id="full-screen-background">
+      <svg viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice" width="100%" height="100%" aria-hidden="true">
+        <defs>
+          <linearGradient id="skyGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#7BE0FA"/>
+            <stop offset="35%" stop-color="#BAF2FF"/>
+            <stop offset="70%" stop-color="#DDF8FF"/>
+            <stop offset="100%" stop-color="#8CE8C8"/>
+          </linearGradient>
+
+          <linearGradient id="hillFarGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#67D99E"/>
+            <stop offset="100%" stop-color="#3BA573"/>
+          </linearGradient>
+
+          <linearGradient id="hillMidGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#4EBA87"/>
+            <stop offset="100%" stop-color="#1E7A52"/>
+          </linearGradient>
+
+          <linearGradient id="pondWaterGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#38BDF8"/>
+            <stop offset="30%" stop-color="#0EA5E9"/>
+            <stop offset="70%" stop-color="#0284C7"/>
+            <stop offset="100%" stop-color="#0369A1"/>
+          </linearGradient>
+
+          <linearGradient id="foregroundGrassGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#34D399"/>
+            <stop offset="35%" stop-color="#10B981"/>
+            <stop offset="80%" stop-color="#047857"/>
+            <stop offset="100%" stop-color="#064E3B"/>
+          </linearGradient>
+
+          <radialGradient id="sunGlow" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#FFFBEB" stop-opacity="0.95"/>
+            <stop offset="50%" stop-color="#FDE047" stop-opacity="0.75"/>
+            <stop offset="100%" stop-color="#F59E0B" stop-opacity="0"/>
+          </radialGradient>
+
+          <radialGradient id="fireflyGrad" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#FFFFFF"/>
+            <stop offset="45%" stop-color="#FEF08A"/>
+            <stop offset="100%" stop-color="#F59E0B" stop-opacity="0"/>
+          </radialGradient>
+
+          <g id="pond-flower">
+            <circle cx="0" cy="-7" r="6" fill="#F472B6"/>
+            <circle cx="7" cy="0" r="6" fill="#F472B6"/>
+            <circle cx="0" cy="7" r="6" fill="#F472B6"/>
+            <circle cx="-7" cy="0" r="6" fill="#F472B6"/>
+            <circle cx="0" cy="0" r="4.5" fill="#FEF08A"/>
+          </g>
+          <g id="yellow-flower">
+            <circle cx="0" cy="-6" r="5" fill="#FBBF24"/>
+            <circle cx="6" cy="0" r="5" fill="#FBBF24"/>
+            <circle cx="0" cy="6" r="5" fill="#FBBF24"/>
+            <circle cx="-6" cy="0" r="5" fill="#FBBF24"/>
+            <circle cx="0" cy="0" r="3.5" fill="#FFFFFF"/>
+          </g>
+        </defs>
+
+        <!-- SKY & SUN -->
+        <rect x="0" y="0" width="1440" height="900" fill="url(#skyGrad)"/>
+        <g transform="translate(240, 140)">
+          <circle cx="0" cy="0" r="130" fill="url(#sunGlow)">
+            <animate attributeName="r" values="120;140;120" dur="6s" repeatCount="indefinite"/>
+          </circle>
+          <circle cx="0" cy="0" r="58" fill="#FFF7ED"/>
+        </g>
+
+        <!-- DRIFTING CLOUDS -->
+        <g opacity="0.9">
+          <g transform="translate(100, 110)">
+            <path d="M 0 35 Q 25 10 60 20 Q 95 -8 145 8 Q 190 -12 230 18 Q 270 5 295 35 Q 320 65 280 82 L 20 82 Q -20 65 0 35 Z" fill="#FFFFFF"/>
+            <animateTransform attributeName="transform" type="translate" from="-320 100" to="1500 100" dur="64s" repeatCount="indefinite"/>
+          </g>
+          <g transform="translate(650, 60)">
+            <path d="M 0 30 Q 30 5 70 18 Q 110 -10 160 5 Q 200 -12 245 15 Q 285 5 310 32 Q 330 60 295 75 L 20 75 Q -15 55 0 30 Z" fill="#FFFFFF"/>
+            <animateTransform attributeName="transform" type="translate" from="-250 50" to="1550 50" dur="46s" repeatCount="indefinite"/>
+          </g>
+          <g transform="translate(1050, 140)" opacity="0.75">
+            <path d="M 0 25 Q 25 5 55 16 Q 85 -5 125 7 Q 155 -8 190 14 Q 220 2 240 25 Q 260 50 225 62 L 15 62 Q -15 45 0 25 Z" fill="#FFFFFF"/>
+            <animateTransform attributeName="transform" type="translate" from="-200 130" to="1600 130" dur="78s" repeatCount="indefinite"/>
+          </g>
+        </g>
+
+        <!-- HILLS & TREES -->
+        <path d="M -50 430 Q 280 320 620 390 T 1490 380 L 1490 580 L -50 580 Z" fill="url(#hillFarGrad)" opacity="0.88"/>
+        <path d="M -50 470 Q 380 370 820 440 T 1490 430 L 1490 620 L -50 620 Z" fill="url(#hillMidGrad)"/>
+        <g>
+          <circle cx="160" cy="380" r="45" fill="#2D6A4F"/>
+          <circle cx="210" cy="370" r="55" fill="#40916C"/>
+          <circle cx="260" cy="385" r="40" fill="#52B788"/>
+          <circle cx="1200" cy="380" r="50" fill="#2D6A4F"/>
+          <circle cx="1260" cy="365" r="60" fill="#40916C"/>
+          <circle cx="1320" cy="385" r="42" fill="#52B788"/>
+        </g>
+
+        <!-- POND WATER & ANIMATED RIPPLES -->
+        <path d="M -60 510 C 260 450 1180 450 1500 510 L 1500 820 C 1120 860 320 860 -60 820 Z" fill="url(#pondWaterGrad)"/>
+        <path d="M 120 540 Q 420 520 720 540 T 1320 540" fill="none" stroke="#BAE6FD" stroke-width="4" stroke-linecap="round" opacity="0.45">
+          <animate attributeName="d"
+            values="M 120 540 Q 420 520 720 540 T 1320 540;
+                    M 120 544 Q 420 560 720 544 T 1320 544;
+                    M 120 540 Q 420 520 720 540 T 1320 540"
+            dur="6s" repeatCount="indefinite"/>
+        </path>
+        <path d="M 80 620 Q 440 600 800 620 T 1360 620" fill="none" stroke="#E0F2FE" stroke-width="4.5" stroke-linecap="round" opacity="0.5">
+          <animate attributeName="d"
+            values="M 80 620 Q 440 600 800 620 T 1360 620;
+                    M 80 625 Q 440 638 800 625 T 1360 625;
+                    M 80 620 Q 440 600 800 620 T 1360 620"
+            dur="7.2s" repeatCount="indefinite"/>
+        </path>
+
+        <!-- SWAYING LILY PADS -->
+        <g transform="translate(260, 580)">
+          <animateTransform attributeName="transform" type="translate" values="260,580; 260,572; 263,583; 260,580" dur="6.5s" repeatCount="indefinite"/>
+          <path d="M 0 0 C 50 -28 100 6 106 38 C 112 72 72 106 12 100 C -48 94 -84 62 -72 22 C -62 -10 -22 0 0 0 Z" fill="#1B4332"/>
+          <path d="M 0 0 C 45 -24 90 5 95 34 C 100 64 65 95 10 90 C -44 84 -75 55 -65 20 C -55 -8 -20 0 0 0 Z" fill="#2D6A4F"/>
+          <use href="#pond-flower" x="25" y="35"/>
+        </g>
+        <g transform="translate(1080, 610)">
+          <animateTransform attributeName="transform" type="translate" values="1080,610; 1083,618; 1078,605; 1080,610" dur="7.8s" repeatCount="indefinite"/>
+          <path d="M 0 0 C 45 -25 90 5 95 35 C 100 65 65 95 10 90 C -45 85 -75 55 -65 20 C -55 -10 -20 0 0 0 Z" fill="#1B4332"/>
+          <path d="M 0 0 C 40 -20 80 5 85 30 C 90 58 58 85 10 80 C -40 75 -65 48 -58 18 C -48 -8 -18 0 0 0 Z" fill="#40916C"/>
+          <use href="#yellow-flower" x="15" y="28"/>
+        </g>
+
+        <!-- FOREGROUND MOUNDS & PEBBLES (NO EMPTY GREEN BOTTOM) -->
+        <path d="M -40 790 Q 220 720 540 780 Q 860 840 1140 770 Q 1340 730 1480 770 L 1480 940 L -40 940 Z" fill="url(#foregroundGrassGrad)"/>
+        <ellipse cx="420" cy="850" rx="36" ry="16" fill="#64748B"/>
+        <ellipse cx="420" cy="848" rx="32" ry="13" fill="#94A3B8"/>
+        <ellipse cx="980" cy="855" rx="38" ry="17" fill="#64748B"/>
+        <ellipse cx="980" cy="852" rx="34" ry="14" fill="#94A3B8"/>
+
+        <!-- CUTE MUSHROOMS -->
+        <g transform="translate(180, 835)">
+          <path d="M 12 40 L 16 16 L 24 16 L 28 40 Z" fill="#FDE68A"/>
+          <path d="M 0 16 C 0 0 40 0 40 16 Z" fill="#EF4444"/>
+          <circle cx="10" cy="9" r="3" fill="#FFFFFF"/>
+          <circle cx="20" cy="5" r="3.5" fill="#FFFFFF"/>
+          <circle cx="30" cy="9" r="3" fill="#FFFFFF"/>
+        </g>
+        <g transform="translate(1260, 830)">
+          <path d="M 10 38 L 14 14 L 22 14 L 26 38 Z" fill="#FDE68A"/>
+          <path d="M 0 14 C 0 -2 36 -2 36 14 Z" fill="#F59E0B"/>
+          <circle cx="9" cy="7" r="2.5" fill="#FFFFFF"/>
+          <circle cx="18" cy="4" r="3" fill="#FFFFFF"/>
+        </g>
+
+        <!-- SWAYING REEDS -->
+        <g transform="translate(40, 680)">
+          <path d="M 0 170 Q 25 80 18 0" stroke="#064E3B" stroke-width="7" fill="none" stroke-linecap="round">
+            <animate attributeName="d" values="M 0 170 Q 25 80 18 0; M 0 170 Q 35 80 28 0; M 0 170 Q 25 80 18 0" dur="4.2s" repeatCount="indefinite"/>
+          </path>
+        </g>
+        <g transform="translate(1380, 690)">
+          <path d="M 20 170 Q -25 80 -18 0" stroke="#064E3B" stroke-width="7" fill="none" stroke-linecap="round">
+            <animate attributeName="d" values="M 20 170 Q -25 80 -18 0; M 20 170 Q -38 80 -30 0; M 20 170 Q -25 80 -18 0" dur="4.6s" repeatCount="indefinite"/>
+          </path>
+        </g>
+
+        <!-- GLOWING FIREFLIES -->
+        <circle cx="360" cy="520" r="16" fill="url(#fireflyGrad)">
+          <animate attributeName="cy" values="520;470;535;520" dur="5.5s" repeatCount="indefinite"/>
+          <animate attributeName="cx" values="360;395;340;360" dur="7.2s" repeatCount="indefinite"/>
+          <animate attributeName="opacity" values="0.3;1;0.4;0.9;0.3" dur="3.2s" repeatCount="indefinite"/>
+        </circle>
+        <circle cx="840" cy="590" r="18" fill="url(#fireflyGrad)">
+          <animate attributeName="cy" values="590;540;610;590" dur="6.1s" repeatCount="indefinite"/>
+          <animate attributeName="opacity" values="0.8;0.2;0.95;0.3;0.8" dur="4.1s" repeatCount="indefinite"/>
+        </circle>
+        <circle cx="1120" cy="780" r="15" fill="url(#fireflyGrad)">
+          <animate attributeName="cy" values="780;740;795;780" dur="5.2s" repeatCount="indefinite"/>
+          <animate attributeName="opacity" values="0.3;1;0.3" dur="3.5s" repeatCount="indefinite"/>
+        </circle>
+      </svg>
+    </div>
+
+    <!-- 2. ENVIRONMENT FOREGROUND OVERLAY -->
+    <div id="environment-foreground"></div>
+
+    <!-- 3. GAME CONTENT & INTERFACE -->
+    <main id="game-content">
+
+      <!-- TOP NAVIGATION BAR -->
+      <header class="top-bar">
+        <!-- Universal Home Button -->
+        <button id="btn-nav-home" class="btn-3d btn-yellow" style="width: 46px; height: 46px; border-radius: 16px;" aria-label="Laman Utama / Home">
+          <svg style="width: 24px; height: 24px; fill: currentColor;" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+        </button>
+
+        <!-- Global Language Selector -->
+        <div style="display: flex; align-items: center; background: rgba(255,255,255,0.94); padding: 4px; border-radius: 9999px; border: 2.5px solid #10B981; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
+          <button id="btn-lang-bm" class="btn-3d btn-green" style="padding: 5px 12px; font-size: 0.8rem; border-radius: 9999px; box-shadow: none;" aria-label="Tukar ke Bahasa Melayu">
+            BM
+          </button>
+          <button id="btn-lang-en" class="btn-3d" style="padding: 5px 12px; font-size: 0.8rem; border-radius: 9999px; background: transparent; color: #064E3B; box-shadow: none;" aria-label="Switch to English">
+            EN
+          </button>
+        </div>
+
+        <!-- Right Side: Sound Toggle with Cute SVG Speaker -->
+        <button id="btn-sound-toggle" class="btn-3d btn-blue" style="width: 46px; height: 46px; border-radius: 16px;" aria-label="Kawalan Bunyi">
+          <span id="sound-icon-container" style="display: flex; align-items: center; justify-content: center;">
+            <!-- Dynamic SVG injected via JS -->
+          </span>
+        </button>
+      </header>
+
+      <!-- ========================================================================= -->
+      <!-- SCREEN 1: HOME SCREEN (CLEAN, MASCOT & PLAY FOCUSED) -->
+      <!-- ========================================================================= -->
+      <section id="screen-home" class="screen">
+        <div style="text-align: center; margin-top: 6px;">
+          <h1 id="txt-home-title" style="font-size: clamp(2.3rem, 7vw, 4rem); font-weight: 800; color: #FFFFFF; text-shadow: 0 4px 8px rgba(0,0,0,0.45), 0 0 20px rgba(16,185,129,0.7); line-height: 1.15;">
+            Tangkap Nombor
+          </h1>
+          <p id="txt-home-subtitle" style="font-size: clamp(1.05rem, 3.5vw, 1.45rem); font-weight: 700; color: #FEF08A; text-shadow: 0 2px 4px rgba(0,0,0,0.4); margin-top: 4px;">
+            Tangkap nombor yang betul!
+          </p>
+        </div>
+
+        <!-- Illustrated Chibi Frog Mascot (Interactive SVG) -->
+        <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; margin: auto 0; width: 100%; max-width: 320px;">
+          <div id="mascot-home-box" class="mascot-bob" style="cursor: pointer;" title="Klik Saya!">
+            <svg id="svg-frog-mascot" style="width: 180px; height: 180px; filter: drop-shadow(0 14px 24px rgba(0,0,0,0.3));" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+              <ellipse cx="100" cy="186" rx="55" ry="10" fill="rgba(0,0,0,0.2)"/>
+              <ellipse cx="56" cy="174" rx="20" ry="11" fill="#059669"/>
+              <ellipse cx="144" cy="174" rx="20" ry="11" fill="#059669"/>
+              <ellipse cx="56" cy="172" rx="15" ry="8" fill="#34D399"/>
+              <ellipse cx="144" cy="172" rx="15" ry="8" fill="#34D399"/>
+              <!-- Body -->
+              <path d="M 45 130 C 35 88 65 58 100 58 C 135 58 165 88 155 130 C 150 165 140 180 100 180 C 60 180 50 165 45 130 Z" fill="#34D399"/>
+              <ellipse cx="100" cy="140" rx="40" ry="30" fill="#A7F3D0"/>
+              <!-- Eyeballs -->
+              <circle cx="68" cy="64" r="27" fill="#34D399"/>
+              <circle cx="132" cy="64" r="27" fill="#34D399"/>
+              <circle cx="68" cy="64" r="20" fill="#FFFFFF"/>
+              <circle cx="132" cy="64" r="20" fill="#FFFFFF"/>
+              <!-- Pupils with Eye-Blink -->
+              <g class="eye-blink">
+                <ellipse cx="72" cy="63" rx="12" ry="13" fill="#064E3B"/>
+                <ellipse cx="128" cy="63" rx="12" ry="13" fill="#064E3B"/>
+                <circle cx="76" cy="58" r="4.5" fill="#FFFFFF"/>
+                <circle cx="69" cy="67" r="2.5" fill="#FFFFFF"/>
+                <circle cx="132" cy="58" r="4.5" fill="#FFFFFF"/>
+                <circle cx="125" cy="67" r="2.5" fill="#FFFFFF"/>
+              </g>
+              <!-- Cheeks -->
+              <circle cx="58" cy="112" r="10" fill="#F472B6" opacity="0.65"/>
+              <circle cx="142" cy="112" r="10" fill="#F472B6" opacity="0.65"/>
+              <!-- Smile -->
+              <path d="M 86 116 Q 100 132 114 116" stroke="#064E3B" stroke-width="4" stroke-linecap="round" fill="#F43F5E"/>
+              <!-- Waving Left Arm -->
+              <g class="arm-wave">
+                <ellipse cx="48" cy="136" rx="12" ry="16" fill="#059669" transform="rotate(22 48 136)"/>
+                <circle cx="43" cy="145" r="5" fill="#34D399"/>
+                <circle cx="50" cy="148" r="5" fill="#34D399"/>
+              </g>
+              <!-- Right Arm -->
+              <ellipse cx="152" cy="138" rx="12" ry="16" fill="#059669" transform="rotate(-18 152 138)"/>
+              <circle cx="157" cy="147" r="5" fill="#34D399"/>
+              <!-- Tiara -->
+              <path d="M 88 40 L 93 25 L 100 33 L 107 25 L 112 40 Z" fill="#F59E0B" stroke="#D97706" stroke-width="2"/>
+            </svg>
+          </div>
+
+          <!-- Main Play Button -->
+          <button id="btn-home-play" class="btn-3d btn-green" style="width: 100%; max-width: 280px; padding: 16px 32px; font-size: 1.75rem; border-radius: 30px; margin-top: 24px;">
+            <svg style="width: 32px; height: 32px; fill: currentColor;" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+            <span id="txt-play-btn">Mula Main</span>
+          </button>
+        </div>
+
+        <footer class="game-footer">Kinder Klub | All Rights Reserved</footer>
+      </section>
+
+      <!-- ========================================================================= -->
+      <!-- SCREEN 2: INSTRUCTIONS SCREEN -->
+      <!-- ========================================================================= -->
+      <section id="screen-instructions" class="screen hidden">
+        <div style="text-align: center;">
+          <h2 id="txt-instr-title" style="font-size: clamp(1.8rem, 5vw, 2.6rem); font-weight: 800; color: #FFFFFF; text-shadow: 0 4px 8px rgba(0,0,0,0.4);">
+            Cara Bermain
+          </h2>
+          <p id="txt-instr-subtitle" style="font-size: 1.15rem; font-weight: 700; color: #FEF08A; text-shadow: 0 2px 4px rgba(0,0,0,0.4); margin-top: 4px;">
+            Tangkap nombor yang ditunjukkan!
+          </p>
+        </div>
+
+        <!-- Demonstration Card -->
+        <div class="glass-card" style="width: 100%; max-width: 380px; padding: 20px; text-align: center; margin: auto 0;">
+          <div style="font-size: 1.15rem; font-weight: 800; color: #064E3B; margin-bottom: 12px;">
+            <span id="lbl-instr-find">Cari nombor:</span> 
+            <span style="display: inline-flex; align-items: center; justify-content: center; width: 46px; height: 46px; border-radius: 9999px; background: #FBBF24; color: #78350F; font-size: 1.7rem; font-weight: 800; margin-left: 6px; box-shadow: 0 4px 10px rgba(0,0,0,0.15);">3</span>
+          </div>
+
+          <!-- Animated Target Catch Graphic -->
+          <div style="position: relative; height: 110px; display: flex; align-items: center; justify-content: center; background: rgba(224, 242, 254, 0.7); border-radius: 20px; border: 2px dashed #38BDF8; overflow: hidden;">
+            <div style="position: absolute; left: 24px; top: 22px; width: 48px; height: 48px; border-radius: 9999px; background: #F472B6; color: #FFF; font-weight: 800; font-size: 1.4rem; display: flex; align-items: center; justify-content: center; opacity: 0.7;">1</div>
+            <div style="position: absolute; right: 28px; bottom: 20px; width: 48px; height: 48px; border-radius: 9999px; background: #34D399; color: #FFF; font-weight: 800; font-size: 1.4rem; display: flex; align-items: center; justify-content: center; opacity: 0.7;">5</div>
+
+            <div style="position: relative; width: 62px; height: 62px; border-radius: 9999px; background: #38BDF8; color: #FFF; font-weight: 800; font-size: 1.9rem; display: flex; align-items: center; justify-content: center; box-shadow: 0 6px 14px rgba(0,0,0,0.2);">
+              3
+              <!-- Tapping finger SVG -->
+              <svg style="position: absolute; right: -18px; bottom: -24px; width: 46px; height: 46px; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3)); animation: gentle-bob 1.6s ease-in-out infinite;" viewBox="0 0 24 24" fill="#FEF08A">
+                <path d="M9 11.24V7.5a2.5 2.5 0 0 1 5 0v3.74c1.21-.81 2-2.18 2-3.74a4.5 4.5 0 0 0-9 0c0 1.56.79 2.93 2 3.74zm6.97 3.26L14 13.5v-6a2 2 0 0 0-4 0v9.5l-3.5-1.5a1.5 1.5 0 0 0-1.9 2.1l5.4 6.8c.4.5 1 .8 1.6.8h6.8c1.1 0 2-.9 2-2v-6.5c0-.8-.5-1.5-1.2-1.8z" stroke="#B45309" stroke-width="1.2"/>
+              </svg>
+            </div>
+          </div>
+
+          <p id="txt-instr-action" style="font-size: 0.95rem; font-weight: 700; color: #047857; margin-top: 14px;">
+            Tekan nombor bergerak yang sepadan dengan sasaran di atas!
+          </p>
+          <p id="txt-instr-tip" style="font-size: 0.8rem; font-weight: 600; color: #064E3B; margin-top: 4px;">
+            Mudah & seronok! Tiada had masa.
+          </p>
+        </div>
+
+        <!-- Next to Session button -->
+        <button id="btn-instr-next" class="btn-3d btn-yellow" style="width: 100%; max-width: 260px; padding: 14px 28px; font-size: 1.5rem; border-radius: 28px;">
+          <span id="txt-instr-btn">Pilih Sesi</span>
+          <svg style="width: 24px; height: 24px; fill: currentColor;" viewBox="0 0 24 24"><path d="M5 13h11.86l-5.43 5.43 1.42 1.42L21.14 12l-8.29-8.29-1.42 1.42L16.86 11H5v2z"/></svg>
+        </button>
+
+        <footer class="game-footer">Kinder Klub | All Rights Reserved</footer>
+      </section>
+
+      <!-- ========================================================================= -->
+      <!-- SCREEN 3: SESSION OPTIONS SCREEN -->
+      <!-- ========================================================================= -->
+      <section id="screen-session" class="screen hidden">
+        <div style="text-align: center;">
+          <h2 id="txt-session-title" style="font-size: clamp(1.8rem, 5vw, 2.5rem); font-weight: 800; color: #FFFFFF; text-shadow: 0 4px 8px rgba(0,0,0,0.4);">
+            Pilih Bilangan Soalan
+          </h2>
+          <p id="txt-session-subtitle" style="font-size: 1.1rem; font-weight: 700; color: #FEF08A; text-shadow: 0 2px 4px rgba(0,0,0,0.4); margin-top: 4px;">
+            Pilih cara anda mahu bermain!
+          </p>
+        </div>
+
+        <div class="glass-card" style="width: 100%; max-width: 380px; padding: 18px; margin: auto 0; display: flex; flex-direction: column; gap: 14px;">
+          <!-- Difficulty range selector (Expanded: 1-5, 1-10, 1-20, 1-50, 1-100) -->
+          <div>
+            <label id="lbl-range-heading" style="display: block; font-size: 0.85rem; font-weight: 800; color: #064E3B; margin-bottom: 8px;">Peringkat Nombor:</label>
+            <div style="display: flex; flex-direction: column; gap: 8px;">
+              <!-- Row 1: 1-5, 1-10, 1-20 -->
+              <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;">
+                <button class="btn-range btn-3d" data-range="5" style="padding: 10px 4px; font-size: 0.9rem; font-weight: 800; border-radius: 16px; border: 2.5px solid #10B981; background: #10B981; color: #FFF;">1 – 5</button>
+                <button class="btn-range btn-3d" data-range="10" style="padding: 10px 4px; font-size: 0.9rem; font-weight: 800; border-radius: 16px; border: 2.5px solid #6EE7B7; background: #FFF; color: #064E3B;">1 – 10</button>
+                <button class="btn-range btn-3d" data-range="20" style="padding: 10px 4px; font-size: 0.9rem; font-weight: 800; border-radius: 16px; border: 2.5px solid #6EE7B7; background: #FFF; color: #064E3B;">1 – 20</button>
+              </div>
+              <!-- Row 2: 1-50, 1-100 -->
+              <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px;">
+                <button class="btn-range btn-3d" data-range="50" style="padding: 10px 4px; font-size: 0.9rem; font-weight: 800; border-radius: 16px; border: 2.5px solid #6EE7B7; background: #FFF; color: #064E3B;">1 – 50</button>
+                <button class="btn-range btn-3d" data-range="100" style="padding: 10px 4px; font-size: 0.9rem; font-weight: 800; border-radius: 16px; border: 2.5px solid #6EE7B7; background: #FFF; color: #064E3B;">1 – 100</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Session questions buttons -->
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 4px;">
+            <button class="btn-session btn-3d btn-green" data-count="5" style="padding: 12px 8px; font-size: 1.15rem; border-radius: 20px;">
+              <span class="lbl-opt-soalan">5 Soalan</span>
+            </button>
+            <button class="btn-session btn-3d btn-green" data-count="10" style="padding: 12px 8px; font-size: 1.15rem; border-radius: 20px;">
+              <span class="lbl-opt-soalan">10 Soalan</span>
+            </button>
+            <button class="btn-session btn-3d btn-green" data-count="20" style="padding: 12px 8px; font-size: 1.15rem; border-radius: 20px;">
+              <span class="lbl-opt-soalan">20 Soalan</span>
+            </button>
+            <button class="btn-session btn-3d btn-blue" data-count="0" style="padding: 12px 8px; font-size: 1.15rem; border-radius: 20px;">
+              <span id="lbl-opt-free">Main Bebas</span>
+            </button>
+          </div>
+        </div>
+
+        <button id="btn-session-back" class="btn-3d btn-yellow" style="width: 100%; max-width: 220px; padding: 10px 20px; font-size: 1.2rem; border-radius: 24px;">
+          <span id="txt-back-btn">Kembali</span>
+        </button>
+
+        <footer class="game-footer">Kinder Klub | All Rights Reserved</footer>
+      </section>
+
+      <!-- ========================================================================= -->
+      <!-- SCREEN 4: GAMEPLAY SCREEN -->
+      <!-- ========================================================================= -->
+      <section id="screen-gameplay" class="screen hidden" style="padding: 48px 12px 8px 12px; justify-content: flex-start;">
+        
+        <!-- Interactive HUD Panel -->
+        <div style="position: relative; z-index: 30; width: 100%; max-width: 440px; display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 6px;">
+          <!-- Score Badge -->
+          <div class="glass-card" style="padding: 6px 14px; border-radius: 20px; display: flex; flex-direction: column; align-items: center; min-width: 76px;">
+            <span id="lbl-score-hud" style="font-size: 0.65rem; font-weight: 800; color: #064E3B; text-transform: uppercase;">Skor</span>
+            <span id="txt-current-score" style="font-size: 1.35rem; font-weight: 800; color: #D97706; line-height: 1;">0</span>
+          </div>
+
+          <!-- TARGET NUMBER HERO BADGE (WITH CUTE SVG TARGET) -->
+          <div class="glass-card" style="padding: 6px 18px; border-radius: 26px; display: flex; align-items: center; gap: 10px; border: 3.5px solid #FBBF24; box-shadow: 0 8px 24px rgba(245,158,11,0.35);">
+            <div style="display: flex; flex-direction: column; align-items: flex-end; justify-content: center;">
+              <span id="lbl-find-target" style="display: block; font-size: 0.75rem; font-weight: 800; color: #064E3B; text-transform: uppercase;">Cari:</span>
+              <!-- Cute Mini Target SVG -->
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" style="margin-top: 1px;">
+                <circle cx="12" cy="12" r="10" stroke="#047857" stroke-width="2.5" fill="#DCFCE7"/>
+                <circle cx="12" cy="12" r="6" stroke="#059669" stroke-width="2.5" fill="#FEF08A"/>
+                <circle cx="12" cy="12" r="2.5" fill="#E11D48"/>
+              </svg>
+            </div>
+            <div id="txt-target-number" style="width: 52px; height: 52px; border-radius: 9999px; background: linear-gradient(180deg, #FDE047 0%, #F59E0B 100%); border: 3px solid #D97706; display: flex; align-items: center; justify-content: center; font-size: 2.1rem; font-weight: 800; color: #78350F; box-shadow: 0 6px 12px rgba(0,0,0,0.18);">
+              1
+            </div>
+          </div>
+
+          <!-- Progress Questions Badge -->
+          <div class="glass-card" style="padding: 6px 14px; border-radius: 20px; display: flex; flex-direction: column; align-items: center; min-width: 76px;">
+            <span id="lbl-question-hud" style="font-size: 0.65rem; font-weight: 800; color: #064E3B; text-transform: uppercase;">Soalan</span>
+            <span id="txt-question-progress" style="font-size: 1.1rem; font-weight: 800; color: #0284C7; line-height: 1.2;">1 / 10</span>
+          </div>
+        </div>
+
+        <!-- Toast Feedback Notification Banner -->
+        <div id="feedback-toast" style="position: absolute; top: 120px; left: 50%; transform: translateX(-50%); padding: 8px 24px; border-radius: 9999px; font-size: 1.2rem; font-weight: 800; pointer-events: none; z-index: 50; opacity: 0; transition: all 0.2s ease;">
+          Bagus!
+        </div>
+
+        <!-- ACTIVE PLAY ARENA (Full vertical and horizontal coverage across the pond) -->
+        <div id="play-arena"></div>
+
+        <footer class="game-footer">Kinder Klub | All Rights Reserved</footer>
+      </section>
+
+      <!-- ========================================================================= -->
+      <!-- SCREEN 5: DRAG-TO-CONNECT BONUS SCREEN (POWERED BY CUTE SVGS) -->
+      <!-- ========================================================================= -->
+      <section id="screen-bonus" class="screen hidden">
+        <div style="text-align: center;">
+          <h2 id="txt-bonus-title" style="font-size: clamp(1.6rem, 4.5vw, 2.3rem); font-weight: 800; color: #FFFFFF; text-shadow: 0 4px 8px rgba(0,0,0,0.4);">
+            Padankan Nombor & Bilangan!
+          </h2>
+          <p id="txt-bonus-subtitle" style="font-size: 1rem; font-weight: 700; color: #FEF08A; text-shadow: 0 2px 4px rgba(0,0,0,0.4); margin-top: 2px;">
+            Tarik garisan dari nombor ke objek yang sepadan.
+          </p>
+        </div>
+
+        <!-- Connecting Container with embedded Pointer-event SVG overlay -->
+        <div class="glass-card" style="position: relative; width: 100%; max-width: 440px; padding: 22px 14px; margin: auto 0; min-height: 270px; display: flex; justify-content: space-between; align-items: center;">
+          <svg id="bonus-lines-svg">
+            <g id="permanent-lines-group"></g>
+            <line id="active-drag-line" x1="0" y1="0" x2="0" y2="0" stroke="#FBBF24" stroke-width="6" stroke-linecap="round" stroke-dasharray="8 6" style="display: none;"/>
+          </svg>
+
+          <!-- Left column: Target Numbers -->
+          <div id="bonus-left-col" style="display: flex; flex-direction: column; gap: 20px; z-index: 25;"></div>
+
+          <!-- Right column: Illustrated Object Quantities (Cute SVGs) -->
+          <div id="bonus-right-col" style="display: flex; flex-direction: column; gap: 20px; z-index: 25;"></div>
+        </div>
+
+        <button id="btn-bonus-skip" class="btn-3d btn-yellow" style="width: 100%; max-width: 220px; padding: 12px 24px; font-size: 1.25rem; border-radius: 24px;">
+          <span id="txt-bonus-continue">Teruskan</span>
+        </button>
+
+        <footer class="game-footer">Kinder Klub | All Rights Reserved</footer>
+      </section>
+
+      <!-- ========================================================================= -->
+      <!-- SCREEN 6: RESULT SCREEN -->
+      <!-- ========================================================================= -->
+      <section id="screen-results" class="screen hidden">
+        <div style="text-align: center;">
+          <h2 id="txt-result-title" style="font-size: clamp(2.4rem, 6.5vw, 3.8rem); font-weight: 800; color: #FFFFFF; text-shadow: 0 4px 10px rgba(0,0,0,0.45);">
+            Tahniah!
+          </h2>
+          <p id="txt-result-cheer" style="font-size: 1.25rem; font-weight: 700; color: #FEF08A; text-shadow: 0 2px 4px rgba(0,0,0,0.4); margin-top: 2px;">
+            Hebat! Anda berjaya menangkap nombor!
+          </p>
+        </div>
+
+        <!-- Celebration Card with Mascot -->
+        <div class="glass-card" style="width: 100%; max-width: 360px; padding: 22px; text-align: center; margin: auto 0; display: flex; flex-direction: column; align-items: center;">
+          <div class="mascot-bob">
+            <svg style="width: 130px; height: 130px; filter: drop-shadow(0 10px 18px rgba(0,0,0,0.25));" viewBox="0 0 200 200">
+              <ellipse cx="100" cy="186" rx="50" ry="10" fill="rgba(0,0,0,0.2)"/>
+              <ellipse cx="56" cy="172" rx="18" ry="10" fill="#059669"/>
+              <ellipse cx="144" cy="172" rx="18" ry="10" fill="#059669"/>
+              <path d="M 45 130 C 35 88 65 58 100 58 C 135 58 165 88 155 130 C 150 165 140 180 100 180 C 60 180 50 165 45 130 Z" fill="#34D399"/>
+              <ellipse cx="100" cy="140" rx="38" ry="28" fill="#A7F3D0"/>
+              <!-- Happy Eyes -->
+              <path d="M 54 66 Q 68 50 82 66" stroke="#064E3B" stroke-width="5" stroke-linecap="round" fill="none"/>
+              <path d="M 118 66 Q 132 50 146 66" stroke="#064E3B" stroke-width="5" stroke-linecap="round" fill="none"/>
+              <circle cx="58" cy="112" r="10" fill="#F472B6" opacity="0.7"/>
+              <circle cx="142" cy="112" r="10" fill="#F472B6" opacity="0.7"/>
+              <path d="M 80 114 Q 100 145 120 114 Z" fill="#F43F5E" stroke="#064E3B" stroke-width="3"/>
+              <!-- Both arms cheering up -->
+              <ellipse cx="38" cy="85" rx="12" ry="20" fill="#059669" transform="rotate(-35 38 85)"/>
+              <ellipse cx="162" cy="85" rx="12" ry="20" fill="#059669" transform="rotate(35 162 85)"/>
+              <path d="M 88 40 L 93 25 L 100 33 L 107 25 L 112 40 Z" fill="#F59E0B" stroke="#D97706" stroke-width="2"/>
+            </svg>
+          </div>
+
+          <!-- Total Score Summary -->
+          <div style="margin-top: 14px;">
+            <div id="lbl-result-final-score" style="font-size: 0.9rem; font-weight: 800; color: #064E3B; text-transform: uppercase;">Jumlah Skor</div>
+            <div id="txt-result-points" style="font-size: 3rem; font-weight: 800; color: #D97706; line-height: 1;">0</div>
+          </div>
+
+          <div id="txt-result-correct-count" style="font-size: 1.1rem; font-weight: 800; color: #047857; margin-top: 6px;">
+            0 / 10 Soalan Betul!
+          </div>
+
+          <p id="txt-result-encourage" style="font-size: 0.85rem; font-weight: 700; color: #065F46; margin-top: 8px;">
+            Jom main lagi untuk terus menjadi juara nombor!
+          </p>
+        </div>
+
+        <!-- Result Action Buttons -->
+        <div style="display: flex; gap: 12px; width: 100%; max-width: 320px;">
+          <button id="btn-result-again" class="btn-3d btn-green" style="flex: 1; padding: 14px; font-size: 1.35rem; border-radius: 24px;">
+            <span id="txt-result-again-btn">Main Lagi</span>
+          </button>
+          <button id="btn-result-home" class="btn-3d btn-yellow" style="flex: 1; padding: 14px; font-size: 1.35rem; border-radius: 24px;">
+            <span id="txt-result-home-btn">Utama</span>
+          </button>
+        </div>
+
+        <footer class="game-footer">Kinder Klub | All Rights Reserved</footer>
+      </section>
+
+    </main>
+  </div>
+
+  <script>
+    /* 1. COMPLETE MALAYSIAN MALAY & ENGLISH DICTIONARIES */
+    const I18N = {
+      ms: {
+        title: "Tangkap Nombor",
+        subtitle: "Tangkap nombor yang betul!",
+        playBtn: "Mula Main",
+        instrTitle: "Cara Bermain",
+        instrSubtitle: "Tangkap nombor yang ditunjukkan!",
+        instrFind: "Cari nombor:",
+        instrAction: "Tekan nombor bergerak yang sepadan dengan sasaran di atas!",
+        instrTip: "Mudah & seronok! Tiada had masa.",
+        instrBtn: "Pilih Sesi",
+        sessionTitle: "Pilih Bilangan Soalan",
+        sessionSubtitle: "Pilih cara anda mahu bermain!",
+        rangeHeading: "Peringkat Nombor:",
+        optQuestions: "Soalan",
+        optFree: "Main Bebas",
+        backBtn: "Kembali",
+        scoreHud: "Skor",
+        questionHud: "Soalan",
+        findTarget: "Cari:",
+        correctToast: "Bagus!",
+        wrongToast: "Cuba lagi!",
+        bonusTitle: "Padankan Nombor & Bilangan!",
+        bonusSubtitle: "Tarik garisan dari nombor ke objek yang sepadan.",
+        bonusContinue: "Teruskan",
+        resultTitle: "Tahniah!",
+        resultCheer: "Hebat! Anda berjaya menangkap nombor!",
+        resultFinalScore: "Jumlah Skor",
+        resultCorrectSummary: "{count} / {total} Soalan Betul!",
+        resultEncourage: "Jom main lagi untuk terus menjadi juara nombor!",
+        resultAgainBtn: "Main Lagi",
+        resultHomeBtn: "Utama",
+        soundOn: "Bunyi: Hidup",
+        soundOff: "Bunyi: Senyap"
+      },
+      en: {
+        title: "Number Catch",
+        subtitle: "Catch the correct number!",
+        playBtn: "Play",
+        instrTitle: "How to Play",
+        instrSubtitle: "Catch the number shown!",
+        instrFind: "Find number:",
+        instrAction: "Tap the moving number that matches the target above!",
+        instrTip: "Easy & fun! No time limit.",
+        instrBtn: "Select Session",
+        sessionTitle: "Select Number of Questions",
+        sessionSubtitle: "Choose how you want to play!",
+        rangeHeading: "Number Range:",
+        optQuestions: "Questions",
+        optFree: "Free Play",
+        backBtn: "Back",
+        scoreHud: "Score",
+        questionHud: "Question",
+        findTarget: "Find:",
+        correctToast: "Great job!",
+        wrongToast: "Try again!",
+        bonusTitle: "Match Numbers & Counts!",
+        bonusSubtitle: "Drag a line from the number to matching objects.",
+        bonusContinue: "Continue",
+        resultTitle: "Well Done!",
+        resultCheer: "Amazing! You caught the numbers!",
+        resultFinalScore: "Total Score",
+        resultCorrectSummary: "{count} / {total} Correct Answers!",
+        resultEncourage: "Let's play again to keep mastering numbers!",
+        resultAgainBtn: "Play Again",
+        resultHomeBtn: "Home",
+        soundOn: "Sound: On",
+        soundOff: "Sound: Mute"
+      }
+    };
+
+    /* 2. CUTE SVG ICON FACTORY (ZERO EMOJIS) */
+    const CUTE_SVGS = {
+      soundOn: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+        <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" fill="currentColor"/>
+        <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+        <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
+      </svg>`,
+      soundOff: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+        <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" fill="currentColor"/>
+        <line x1="23" y1="9" x2="17" y2="15"/>
+        <line x1="17" y1="9" x2="23" y2="15"/>
+      </svg>`,
+      star: (sz) => `<svg viewBox="0 0 32 32" width="${sz}" height="${sz}" style="flex-shrink:0;">
+        <polygon points="16,2 20.5,11.5 31,13 23.5,20.5 25.5,31 16,26 6.5,31 8.5,20.5 1,13 11.5,11.5" fill="#FBBF24" stroke="#D97706" stroke-width="1.5"/>
+        <circle cx="12" cy="14" r="1.6" fill="#78350F"/>
+        <circle cx="20" cy="14" r="1.6" fill="#78350F"/>
+        <path d="M13 18 Q16 21 19 18" stroke="#78350F" stroke-width="1.6" stroke-linecap="round" fill="none"/>
+      </svg>`,
+      apple: (sz) => `<svg viewBox="0 0 32 32" width="${sz}" height="${sz}" style="flex-shrink:0;">
+        <path d="M16 8 Q18 4 22 5 Q22 9 18 10 Z" fill="#10B981"/>
+        <path d="M16 10 C10 8 4 12 4 19 C4 27 12 30 16 30 C20 30 28 27 28 19 C28 12 22 8 16 10 Z" fill="#EF4444" stroke="#B91C1C" stroke-width="1.5"/>
+        <ellipse cx="11" cy="16" rx="2" ry="4" fill="#FCA5A5" transform="rotate(-20 11 16)"/>
+      </svg>`,
+      flower: (sz) => `<svg viewBox="0 0 32 32" width="${sz}" height="${sz}" style="flex-shrink:0;">
+        <circle cx="16" cy="8" r="5" fill="#F472B6"/>
+        <circle cx="24" cy="16" r="5" fill="#F472B6"/>
+        <circle cx="16" cy="24" r="5" fill="#F472B6"/>
+        <circle cx="8" cy="16" r="5" fill="#F472B6"/>
+        <circle cx="16" cy="16" r="5.5" fill="#FDE047" stroke="#D97706" stroke-width="1.2"/>
+      </svg>`,
+      mushroom: (sz) => `<svg viewBox="0 0 32 32" width="${sz}" height="${sz}" style="flex-shrink:0;">
+        <path d="M12 28 L14 17 L18 17 L20 28 Z" fill="#FDE68A" stroke="#D97706" stroke-width="1.2"/>
+        <path d="M4 17 C4 7 28 7 28 17 Z" fill="#EF4444" stroke="#B91C1C" stroke-width="1.5"/>
+        <circle cx="10" cy="12" r="2.2" fill="#FFFFFF"/>
+        <circle cx="16" cy="9" r="2.5" fill="#FFFFFF"/>
+        <circle cx="22" cy="12" r="2.2" fill="#FFFFFF"/>
+      </svg>`,
+      leaf: (sz) => `<svg viewBox="0 0 32 32" width="${sz}" height="${sz}" style="flex-shrink:0;">
+        <path d="M6 26 C6 26 8 10 26 6 C26 6 26 24 6 26 Z" fill="#34D399" stroke="#059669" stroke-width="1.5"/>
+        <path d="M6 26 C12 20 18 14 26 6" stroke="#059669" stroke-width="1.5" fill="none"/>
+      </svg>`,
+      balloon: (sz) => `<svg viewBox="0 0 32 32" width="${sz}" height="${sz}" style="flex-shrink:0;">
+        <ellipse cx="16" cy="13" rx="10" ry="12" fill="#818CF8" stroke="#4F46E5" stroke-width="1.5"/>
+        <polygon points="14,25 18,25 16,23" fill="#4F46E5"/>
+        <path d="M16 25 Q14 28 17 31" stroke="#6B7280" stroke-width="1.2" fill="none"/>
+        <ellipse cx="13" cy="9" rx="2" ry="4" fill="#C7D2FE" transform="rotate(-25 13 9)"/>
+      </svg>`,
+      strawberry: (sz) => `<svg viewBox="0 0 32 32" width="${sz}" height="${sz}" style="flex-shrink:0;">
+        <path d="M8 12 C6 18 12 28 16 30 C20 28 26 18 24 12 C24 8 8 8 8 12 Z" fill="#F43F5E" stroke="#BE123C" stroke-width="1.5"/>
+        <path d="M12 7 L16 10 L20 7 L17 11 L16 6 Z" fill="#10B981"/>
+        <circle cx="13" cy="14" r="1" fill="#FEF08A"/>
+        <circle cx="18" cy="15" r="1" fill="#FEF08A"/>
+        <circle cx="15" cy="19" r="1" fill="#FEF08A"/>
+        <circle cx="13" cy="24" r="1" fill="#FEF08A"/>
+        <circle cx="17" cy="23" r="1" fill="#FEF08A"/>
+      </svg>`,
+      frog: (sz) => `<svg viewBox="0 0 32 32" width="${sz}" height="${sz}" style="flex-shrink:0;">
+        <ellipse cx="16" cy="18" rx="11" ry="9" fill="#34D399" stroke="#059669" stroke-width="1.5"/>
+        <circle cx="10" cy="11" r="4.5" fill="#34D399" stroke="#059669" stroke-width="1.2"/>
+        <circle cx="22" cy="11" r="4.5" fill="#34D399" stroke="#059669" stroke-width="1.2"/>
+        <circle cx="10" cy="11" r="2.5" fill="#064E3B"/>
+        <circle cx="22" cy="11" r="2.5" fill="#064E3B"/>
+        <path d="M12 19 Q16 23 20 19" stroke="#064E3B" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+      </svg>`
+    };
+
+    /* 3. CENTRAL STATE */
+    const STATE = {
+      lang: localStorage.getItem('kk_tn_lang') || 'ms',
+      soundEnabled: localStorage.getItem('kk_tn_sound') !== 'false',
+      numberRange: parseInt(localStorage.getItem('kk_tn_range') || '5', 10),
+      sessionTotal: 10,
+      currentQuestionIndex: 0,
+      score: 0,
+      correctCount: 0,
+      currentTarget: 1,
+      activeMovingObjects: [],
+      animationFrameId: null,
+      isCatching: false,
+      variationIndex: 0,
+      dragBonusCompleted: false
+    };
+
+    /* 4. SYNTHESIZED WEB AUDIO SOUND ENGINE */
+    let audioCtx = null;
+
+    function initAudioContext() {
+      if (!audioCtx) {
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        if (AudioContextClass) audioCtx = new AudioContextClass();
+      }
+      if (audioCtx && audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+    }
+
+    function playTone(freq, type = 'sine', duration = 0.15, gainVal = 0.22) {
+      if (!STATE.soundEnabled) return;
+      try {
+        initAudioContext();
+        if (!audioCtx) return;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        gain.gain.setValueAtTime(gainVal, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + duration);
+      } catch (e) {}
+    }
+
+    function playPopSound() {
+      playTone(460, 'triangle', 0.1, 0.2);
+    }
+
+    function playSuccessChime() {
+      if (!STATE.soundEnabled) return;
+      initAudioContext();
+      const notes = [523.25, 659.25, 783.99, 1046.50];
+      notes.forEach((freq, i) => {
+        setTimeout(() => playTone(freq, 'sine', 0.18, 0.22), i * 65);
+      });
+    }
+
+    function playWrongSound() {
+      if (!STATE.soundEnabled) return;
+      playTone(220, 'sine', 0.22, 0.18);
+    }
+
+    function playCheerFanfare() {
+      if (!STATE.soundEnabled) return;
+      initAudioContext();
+      const notes = [392.00, 523.25, 659.25, 783.99, 1046.50];
+      notes.forEach((freq, i) => {
+        setTimeout(() => playTone(freq, 'triangle', 0.35, 0.24), i * 85);
+      });
+    }
+
+    /* 5. LOCALIZATION & UI REFRESH */
+    function applyLocalization() {
+      const texts = I18N[STATE.lang];
+      document.documentElement.lang = STATE.lang;
+
+      // Header Language Button States
+      const btnBm = document.getElementById('btn-lang-bm');
+      const btnEn = document.getElementById('btn-lang-en');
+      if (STATE.lang === 'ms') {
+        btnBm.className = "btn-3d btn-green";
+        btnBm.style.background = "";
+        btnBm.style.color = "#FFFFFF";
+        btnEn.className = "btn-3d";
+        btnEn.style.background = "transparent";
+        btnEn.style.color = "#064E3B";
+      } else {
+        btnEn.className = "btn-3d btn-green";
+        btnEn.style.background = "";
+        btnEn.style.color = "#FFFFFF";
+        btnBm.className = "btn-3d";
+        btnBm.style.background = "transparent";
+        btnBm.style.color = "#064E3B";
+      }
+
+      // Home Screen
+      document.getElementById('txt-home-title').textContent = texts.title;
+      document.getElementById('txt-home-subtitle').textContent = texts.subtitle;
+      document.getElementById('txt-play-btn').textContent = texts.playBtn;
+
+      // Instructions Screen
+      document.getElementById('txt-instr-title').textContent = texts.instrTitle;
+      document.getElementById('txt-instr-subtitle').textContent = texts.instrSubtitle;
+      document.getElementById('lbl-instr-find').textContent = texts.instrFind;
+      document.getElementById('txt-instr-action').textContent = texts.instrAction;
+      document.getElementById('txt-instr-tip').textContent = texts.instrTip;
+      document.getElementById('txt-instr-btn').textContent = texts.instrBtn;
+
+      // Session Selection Screen
+      document.getElementById('txt-session-title').textContent = texts.sessionTitle;
+      document.getElementById('txt-session-subtitle').textContent = texts.sessionSubtitle;
+      document.getElementById('lbl-range-heading').textContent = texts.rangeHeading;
+      document.getElementById('lbl-opt-free').textContent = texts.optFree;
+      document.getElementById('txt-back-btn').textContent = texts.backBtn;
+      document.querySelectorAll('.lbl-opt-soalan').forEach(el => {
+        const count = el.parentElement.getAttribute('data-count');
+        el.textContent = `${count} ${texts.optQuestions}`;
+      });
+
+      // Gameplay HUD
+      document.getElementById('lbl-score-hud').textContent = texts.scoreHud;
+      document.getElementById('lbl-question-hud').textContent = texts.questionHud;
+      document.getElementById('lbl-find-target').textContent = texts.findTarget;
+
+      // Bonus Drag Screen
+      document.getElementById('txt-bonus-title').textContent = texts.bonusTitle;
+      document.getElementById('txt-bonus-subtitle').textContent = texts.bonusSubtitle;
+      document.getElementById('txt-bonus-continue').textContent = texts.bonusContinue;
+
+      // Result Screen
+      document.getElementById('txt-result-title').textContent = texts.resultTitle;
+      document.getElementById('txt-result-cheer').textContent = texts.resultCheer;
+      document.getElementById('lbl-result-final-score').textContent = texts.resultFinalScore;
+      document.getElementById('txt-result-encourage').textContent = texts.resultEncourage;
+      document.getElementById('txt-result-again-btn').textContent = texts.resultAgainBtn;
+      document.getElementById('txt-result-home-btn').textContent = texts.resultHomeBtn;
+
+      // Sound Control SVG Label & Icon
+      const soundBtn = document.getElementById('btn-sound-toggle');
+      soundBtn.setAttribute('aria-label', STATE.soundEnabled ? texts.soundOn : texts.soundOff);
+      document.getElementById('sound-icon-container').innerHTML = STATE.soundEnabled ? CUTE_SVGS.soundOn : CUTE_SVGS.soundOff;
+    }
+
+    /* 6. SCREEN SWITCHING ROUTER */
+    const SCREENS = {
+      home: document.getElementById('screen-home'),
+      instructions: document.getElementById('screen-instructions'),
+      session: document.getElementById('screen-session'),
+      gameplay: document.getElementById('screen-gameplay'),
+      bonus: document.getElementById('screen-bonus'),
+      results: document.getElementById('screen-results')
+    };
+
+    function showScreen(screenKey) {
+      stopGameLoop();
+      Object.keys(SCREENS).forEach(key => {
+        if (key === screenKey) {
+          SCREENS[key].classList.remove('hidden');
+        } else {
+          SCREENS[key].classList.add('hidden');
+        }
+      });
+      // Home icon visibility
+      const homeBtn = document.getElementById('btn-nav-home');
+      homeBtn.style.visibility = (screenKey === 'home') ? 'hidden' : 'visible';
+    }
+
+    /* 7. ARCADE NUMBER-CATCHING ENGINE & PHYSICS */
+    const VARIATION_CLASSES = [
+      'var-bubble',
+      'var-balloon',
+      'var-star',
+      'var-jelly',
+      'var-droplet'
+    ];
+
+    const arena = document.getElementById('play-arena');
+
+    function startQuestion() {
+      STATE.isCatching = false;
+      arena.innerHTML = '';
+      STATE.activeMovingObjects = [];
+
+      // Update HUD
+      const progEl = document.getElementById('txt-question-progress');
+      if (STATE.sessionTotal === 0) {
+        progEl.textContent = `${STATE.currentQuestionIndex + 1} / ∞`;
+      } else {
+        progEl.textContent = `${STATE.currentQuestionIndex + 1} / ${STATE.sessionTotal}`;
+      }
+
+      // Pick target within selected range
+      const range = STATE.numberRange;
+      const target = Math.floor(Math.random() * range) + 1;
+      STATE.currentTarget = target;
+      
+      const targetEl = document.getElementById('txt-target-number');
+      targetEl.textContent = target;
+      // Dynamic target font sizing for multi-digit numbers (1-50, 1-100)
+      if (target >= 100) {
+        targetEl.style.fontSize = '1.35rem';
+      } else if (target >= 10) {
+        targetEl.style.fontSize = '1.75rem';
+      } else {
+        targetEl.style.fontSize = '2.1rem';
+      }
+
+      // Distractor numbers pool
+      const set = new Set([target]);
+      const distractorCount = Math.min(3, range - 1);
+      while (set.size < distractorCount + 1) {
+        set.add(Math.floor(Math.random() * range) + 1);
+      }
+      const numbersToSpawn = Array.from(set).sort(() => Math.random() - 0.5);
+
+      // Rotate visual styling
+      STATE.variationIndex = (STATE.variationIndex + 1) % VARIATION_CLASSES.length;
+      const currentStyle = VARIATION_CLASSES[STATE.variationIndex];
+
+      const arenaRect = arena.getBoundingClientRect();
+      const arenaW = arena.clientWidth || arenaRect.width || window.innerWidth;
+      const arenaH = arena.clientHeight || arenaRect.height || (window.innerHeight - 170);
+
+      const objSize = 76;
+      const margin = 12;
+      const maxW = Math.max(20, arenaW - objSize - margin);
+      const maxH = Math.max(20, arenaH - objSize - margin);
+
+      numbersToSpawn.forEach((num, index) => {
+        const el = document.createElement('div');
+        el.className = `moving-target ${currentStyle}`;
+        el.textContent = num;
+        el.setAttribute('data-num', num);
+        el.setAttribute('role', 'button');
+        el.setAttribute('aria-label', `${STATE.lang === 'ms' ? 'Nombor' : 'Number'} ${num}`);
+
+        // Responsive font scaling for double and triple-digit numbers
+        if (num >= 100) {
+          el.style.fontSize = '1.5rem';
+        } else if (num >= 10) {
+          el.style.fontSize = '1.95rem';
+        }
+
+        // Evenly disperse starting coordinates
+        const slotY = (maxH / numbersToSpawn.length) * index;
+        const x = margin + Math.random() * maxW;
+        const y = Math.min(maxH, margin + slotY + (Math.random() * 20));
+
+        // Child-friendly gentle speeds (0.85 - 1.5 px/frame)
+        const speedMultiplier = 0.85;
+        let vx = (Math.random() * 1.3 + 0.6) * (Math.random() > 0.5 ? 1 : -1) * speedMultiplier;
+        let vy = (Math.random() * 1.3 + 0.6) * (Math.random() > 0.5 ? 1 : -1) * speedMultiplier;
+
+        const objData = {
+          el,
+          x,
+          y,
+          vx,
+          vy,
+          size: objSize,
+          num: num,
+          isTarget: (num === target),
+          angle: 0,
+          angleSpeed: (Math.random() - 0.5) * 0.04
+        };
+
+        el.addEventListener('pointerdown', (e) => {
+          e.preventDefault();
+          onTargetTapped(objData);
+        });
+
+        arena.appendChild(el);
+        STATE.activeMovingObjects.push(objData);
+      });
+
+      startPhysicsLoop();
+    }
+
+    function onTargetTapped(targetObj) {
+      if (STATE.isCatching) return;
+
+      if (targetObj.isTarget) {
+        // JAWAPAN BETUL
+        STATE.isCatching = true;
+        STATE.score += 10;
+        STATE.correctCount++;
+        document.getElementById('txt-current-score').textContent = STATE.score;
+
+        playSuccessChime();
+        showFeedback(true);
+
+        targetObj.el.classList.add('catch-effect');
+        createSparkles(targetObj.x + 38, targetObj.y + 38);
+
+        setTimeout(() => {
+          STATE.currentQuestionIndex++;
+
+          // Selesai atau pusingan bonus
+          if (STATE.sessionTotal > 0 && STATE.currentQuestionIndex >= STATE.sessionTotal) {
+            endSession();
+          } else if (STATE.currentQuestionIndex === 3 && !STATE.dragBonusCompleted) {
+            startBonusMiniGame();
+          } else {
+            startQuestion();
+          }
+        }, 580);
+
+      } else {
+        // JAWAPAN SALAH: Maklum balas seketika, terus mara ke soalan seterusnya tanpa tolak markah
+        STATE.isCatching = true;
+        playWrongSound();
+        showFeedback(false);
+        targetObj.el.classList.remove('wiggle-effect');
+        void targetObj.el.offsetWidth;
+        targetObj.el.classList.add('wiggle-effect');
+
+        setTimeout(() => {
+          STATE.currentQuestionIndex++;
+
+          if (STATE.sessionTotal > 0 && STATE.currentQuestionIndex >= STATE.sessionTotal) {
+            endSession();
+          } else if (STATE.currentQuestionIndex === 3 && !STATE.dragBonusCompleted) {
+            startBonusMiniGame();
+          } else {
+            startQuestion();
+          }
+        }, 650);
+      }
+    }
+
+    function createSparkles(cx, cy) {
+      const colors = ['#FEF08A', '#F472B6', '#38BDF8', '#34D399', '#FFF'];
+      for (let i = 0; i < 7; i++) {
+        const p = document.createElement('div');
+        p.style.position = 'absolute';
+        p.style.width = '10px';
+        p.style.height = '10px';
+        p.style.borderRadius = '9999px';
+        p.style.backgroundColor = colors[i % colors.length];
+        p.style.left = `${cx}px`;
+        p.style.top = `${cy}px`;
+        p.style.pointerEvents = 'none';
+        p.style.zIndex = '60';
+        p.style.boxShadow = '0 0 10px #FFFFFF';
+
+        const angle = (i / 7) * Math.PI * 2;
+        const dist = 40 + Math.random() * 20;
+        const tx = Math.cos(angle) * dist;
+        const ty = Math.sin(angle) * dist;
+
+        p.animate([
+          { transform: 'translate(0,0) scale(1)', opacity: 1 },
+          { transform: `translate(${tx}px, ${ty}px) scale(0)`, opacity: 0 }
+        ], {
+          duration: 480,
+          easing: 'cubic-bezier(0, .9, .57, 1)'
+        }).onfinish = () => p.remove();
+
+        arena.appendChild(p);
+      }
+    }
+
+    function showFeedback(isCorrect) {
+      const toast = document.getElementById('feedback-toast');
+      const texts = I18N[STATE.lang];
+      toast.textContent = isCorrect ? texts.correctToast : texts.wrongToast;
+
+      if (isCorrect) {
+        toast.style.background = '#10B981';
+        toast.style.color = '#FFFFFF';
+        toast.style.border = '3px solid #FFFFFF';
+        toast.style.boxShadow = '0 10px 24px rgba(16,185,129,0.5)';
+      } else {
+        toast.style.background = '#FBBF24';
+        toast.style.color = '#78350F';
+        toast.style.border = '3px solid #FFFFFF';
+        toast.style.boxShadow = '0 10px 24px rgba(245,158,11,0.5)';
+      }
+
+      toast.style.opacity = '1';
+      toast.style.transform = 'translateX(-50%) scale(1.08)';
+
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateX(-50%) scale(0.95)';
+      }, 650);
+    }
+
+    function startPhysicsLoop() {
+      stopGameLoop();
+
+      function update() {
+        const arenaRect = arena.getBoundingClientRect();
+        const maxW = Math.max(20, (arena.clientWidth || arenaRect.width) - 82);
+        const maxH = Math.max(20, (arena.clientHeight || arenaRect.height) - 82);
+
+        STATE.activeMovingObjects.forEach(obj => {
+          obj.x += obj.vx;
+          obj.y += obj.vy;
+          obj.angle += obj.angleSpeed;
+
+          // Pantulan mendatar
+          if (obj.x <= 6) {
+            obj.x = 6;
+            obj.vx = Math.abs(obj.vx);
+          } else if (obj.x >= maxW) {
+            obj.x = maxW;
+            obj.vx = -Math.abs(obj.vx);
+          }
+
+          // Pantulan menegak (Betul-betul membalikkan arah menegak vy)
+          if (obj.y <= 6) {
+            obj.y = 6;
+            obj.vy = Math.abs(obj.vy);
+          } else if (obj.y >= maxH) {
+            obj.y = maxH;
+            obj.vy = -Math.abs(obj.vy);
+          }
+
+          obj.el.style.transform = `translate3d(${obj.x}px, ${obj.y}px, 0) rotate(${Math.sin(obj.angle) * 7}deg)`;
+        });
+
+        STATE.animationFrameId = requestAnimationFrame(update);
+      }
+
+      STATE.animationFrameId = requestAnimationFrame(update);
+    }
+
+    function stopGameLoop() {
+      if (STATE.animationFrameId) {
+        cancelAnimationFrame(STATE.animationFrameId);
+        STATE.animationFrameId = null;
+      }
+    }
+
+    /* 8. DRAG-TO-CONNECT BONUS MINI-GAME (DENGAN CUTE SVG) */
+    function startBonusMiniGame() {
+      STATE.dragBonusCompleted = true;
+      showScreen('bonus');
+
+      const leftCol = document.getElementById('bonus-left-col');
+      const rightCol = document.getElementById('bonus-right-col');
+      const permGroup = document.getElementById('permanent-lines-group');
+      const dragLine = document.getElementById('active-drag-line');
+      const svg = document.getElementById('bonus-lines-svg');
+
+      leftCol.innerHTML = '';
+      rightCol.innerHTML = '';
+      permGroup.innerHTML = '';
+      dragLine.style.display = 'none';
+
+      // Hadkan bilang nombor visual bonus kepada 1-10 untuk kemampuan mengira kanak-kanak prasekolah
+      const countMax = Math.min(STATE.numberRange || 5, 10);
+      const availableNums = [];
+      for (let i = 1; i <= countMax; i++) {
+        availableNums.push(i);
+      }
+      const shuffledNums = availableNums.sort(() => Math.random() - 0.5);
+      const chosenNums = shuffledNums.slice(0, 3).sort((a, b) => a - b);
+
+      // Koleksi penjana SVG Comel
+      const svgKeys = ['star', 'apple', 'flower', 'mushroom', 'leaf', 'balloon', 'strawberry', 'frog'];
+      const shuffledKeys = [...svgKeys].sort(() => Math.random() - 0.5);
+
+      const pairs = chosenNums.map((num, idx) => ({
+        num: num,
+        count: num,
+        svgKey: shuffledKeys[idx % shuffledKeys.length]
+      }));
+
+      const shuffledRight = [...pairs].sort(() => Math.random() - 0.5);
+      let matchedPairs = 0;
+      let activeDrag = null;
+
+      // Nod nombor sebelah kiri
+      pairs.forEach(pair => {
+        const node = document.createElement('div');
+        node.className = "btn-3d btn-yellow";
+        node.style.width = "54px";
+        node.style.height = "54px";
+        node.style.borderRadius = "18px";
+        node.style.fontSize = pair.num >= 10 ? "1.45rem" : "1.7rem";
+        node.textContent = pair.num;
+        node.setAttribute('data-num', pair.num);
+        leftCol.appendChild(node);
+
+        node.addEventListener('pointerdown', (e) => {
+          if (node.classList.contains('matched')) return;
+          initAudioContext();
+          playPopSound();
+
+          const svgRect = svg.getBoundingClientRect();
+          const nodeRect = node.getBoundingClientRect();
+          const startX = (nodeRect.left + nodeRect.width / 2) - svgRect.left;
+          const startY = (nodeRect.top + nodeRect.height / 2) - svgRect.top;
+
+          activeDrag = { num: pair.num, startNode: node, startX, startY };
+          dragLine.setAttribute('x1', startX);
+          dragLine.setAttribute('y1', startY);
+          dragLine.setAttribute('x2', startX);
+          dragLine.setAttribute('y2', startY);
+          dragLine.style.display = 'block';
+
+          node.setPointerCapture(e.pointerId);
+        });
+
+        node.addEventListener('pointermove', (e) => {
+          if (!activeDrag || activeDrag.startNode !== node) return;
+          const svgRect = svg.getBoundingClientRect();
+          const curX = e.clientX - svgRect.left;
+          const curY = e.clientY - svgRect.top;
+
+          dragLine.setAttribute('x2', curX);
+          dragLine.setAttribute('y2', curY);
+        });
+
+        node.addEventListener('pointerup', (e) => {
+          if (!activeDrag || activeDrag.startNode !== node) return;
+          dragLine.style.display = 'none';
+
+          const hitEl = document.elementFromPoint(e.clientX, e.clientY);
+          const rightTargetNode = hitEl ? hitEl.closest('.bonus-right-node') : null;
+
+          if (rightTargetNode && !rightTargetNode.classList.contains('matched')) {
+            const count = parseInt(rightTargetNode.getAttribute('data-count'), 10);
+            if (count === activeDrag.num) {
+              // SEPADAN!
+              playSuccessChime();
+              node.classList.add('matched');
+              node.style.opacity = '0.6';
+              rightTargetNode.classList.add('matched');
+              rightTargetNode.style.opacity = '0.6';
+              rightTargetNode.style.background = '#A7F3D0';
+
+              const svgRect = svg.getBoundingClientRect();
+              const rRect = rightTargetNode.getBoundingClientRect();
+              const endX = (rRect.left + rRect.width / 2) - svgRect.left;
+              const endY = (rRect.top + rRect.height / 2) - svgRect.top;
+
+              const permLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+              permLine.setAttribute('x1', activeDrag.startX);
+              permLine.setAttribute('y1', activeDrag.startY);
+              permLine.setAttribute('x2', endX);
+              permLine.setAttribute('y2', endY);
+              permLine.setAttribute('class', 'snap-line');
+              permGroup.appendChild(permLine);
+
+              matchedPairs++;
+              STATE.score += 10;
+
+              if (matchedPairs >= pairs.length) {
+                setTimeout(() => playCheerFanfare(), 300);
+              }
+            } else {
+              playWrongSound();
+            }
+          }
+          activeDrag = null;
+        });
+      });
+
+      // Nod kuantiti sebelah kanan menggunakan CUTE SVG
+      shuffledRight.forEach(pair => {
+        const node = document.createElement('div');
+        node.className = "bonus-right-node glass-card";
+        node.style.minWidth = "95px";
+        node.style.maxWidth = "135px";
+        node.style.minHeight = "54px";
+        node.style.display = "flex";
+        node.style.flexWrap = "wrap";
+        node.style.alignItems = "center";
+        node.style.justifyContent = "center";
+        node.style.gap = "4px";
+        node.style.padding = "6px 8px";
+        node.style.borderRadius = "18px";
+        node.setAttribute('data-count', pair.count);
+
+        // Skala saiz ikon SVG mengikut bilangan
+        let iconSize = "26px";
+        if (pair.count > 10) {
+          iconSize = "16px";
+        } else if (pair.count > 6) {
+          iconSize = "20px";
+        } else if (pair.count > 3) {
+          iconSize = "22px";
+        }
+
+        let svgHtml = '';
+        const generator = CUTE_SVGS[pair.svgKey] || CUTE_SVGS.star;
+        for (let i = 0; i < pair.count; i++) {
+          svgHtml += generator(iconSize);
+        }
+        node.innerHTML = svgHtml;
+        rightCol.appendChild(node);
+      });
+    }
+
+    /* 9. SESSION COMPLETION */
+    function endSession() {
+      stopGameLoop();
+      playCheerFanfare();
+
+      const finalTotal = STATE.sessionTotal > 0 ? STATE.sessionTotal : STATE.currentQuestionIndex;
+      const texts = I18N[STATE.lang];
+      document.getElementById('txt-result-points').textContent = STATE.score;
+
+      const summary = texts.resultCorrectSummary
+        .replace('{count}', STATE.correctCount)
+        .replace('{total}', finalTotal);
+
+      document.getElementById('txt-result-correct-count').textContent = summary;
+      showScreen('results');
+    }
+
+    /* 10. GLOBAL EVENT LISTENERS */
+    document.getElementById('btn-lang-bm').addEventListener('click', () => {
+      STATE.lang = 'ms';
+      localStorage.setItem('kk_tn_lang', 'ms');
+      applyLocalization();
+      playPopSound();
+    });
+
+    document.getElementById('btn-lang-en').addEventListener('click', () => {
+      STATE.lang = 'en';
+      localStorage.setItem('kk_tn_lang', 'en');
+      applyLocalization();
+      playPopSound();
+    });
+
+    document.getElementById('btn-sound-toggle').addEventListener('click', () => {
+      STATE.soundEnabled = !STATE.soundEnabled;
+      localStorage.setItem('kk_tn_sound', STATE.soundEnabled);
+      applyLocalization();
+      if (STATE.soundEnabled) playPopSound();
+    });
+
+    document.getElementById('btn-nav-home').addEventListener('click', () => {
+      playPopSound();
+      showScreen('home');
+    });
+
+    /* Interactive Mascot Click */
+    document.getElementById('mascot-home-box').addEventListener('click', () => {
+      initAudioContext();
+      playPopSound();
+      const mascot = document.getElementById('svg-frog-mascot');
+      mascot.animate([
+        { transform: 'scale(1) rotate(0deg)' },
+        { transform: 'scale(1.18) rotate(-8deg)' },
+        { transform: 'scale(1.18) rotate(8deg)' },
+        { transform: 'scale(1) rotate(0deg)' }
+      ], { duration: 380, easing: 'ease-out' });
+    });
+
+    /* Screen Navigations */
+    document.getElementById('btn-home-play').addEventListener('click', () => {
+      initAudioContext();
+      playPopSound();
+      showScreen('instructions');
+    });
+
+    document.getElementById('btn-instr-next').addEventListener('click', () => {
+      initAudioContext();
+      playPopSound();
+      showScreen('session');
+    });
+
+    document.getElementById('btn-session-back').addEventListener('click', () => {
+      initAudioContext();
+      playPopSound();
+      showScreen('instructions');
+    });
+
+    /* Range Selector */
+    document.querySelectorAll('.btn-range').forEach(btn => {
+      btn.addEventListener('click', () => {
+        playPopSound();
+        const r = parseInt(btn.getAttribute('data-range'), 10);
+        STATE.numberRange = r;
+        localStorage.setItem('kk_tn_range', r);
+
+        document.querySelectorAll('.btn-range').forEach(b => {
+          b.style.background = '#FFFFFF';
+          b.style.color = '#064E3B';
+          b.style.borderColor = '#6EE7B7';
+        });
+        btn.style.background = '#10B981';
+        btn.style.color = '#FFFFFF';
+        btn.style.borderColor = '#10B981';
+      });
+    });
+
+    document.querySelectorAll('.btn-range').forEach(b => {
+      if (parseInt(b.getAttribute('data-range'), 10) === STATE.numberRange) {
+        b.style.background = '#10B981';
+        b.style.color = '#FFFFFF';
+        b.style.borderColor = '#10B981';
+      }
+    });
+
+    /* Session Question Triggers */
+    document.querySelectorAll('.btn-session').forEach(btn => {
+      btn.addEventListener('click', () => {
+        initAudioContext();
+        playPopSound();
+        const count = parseInt(btn.getAttribute('data-count'), 10);
+        STATE.sessionTotal = count;
+        STATE.currentQuestionIndex = 0;
+        STATE.score = 0;
+        STATE.correctCount = 0;
+        STATE.dragBonusCompleted = false;
+        document.getElementById('txt-current-score').textContent = '0';
+
+        showScreen('gameplay');
+        startQuestion();
+      });
+    });
+
+    /* Bonus Continue Button */
+    document.getElementById('btn-bonus-skip').addEventListener('click', () => {
+      initAudioContext();
+      playPopSound();
+      showScreen('gameplay');
+      startQuestion();
+    });
+
+    /* Result Actions */
+    document.getElementById('btn-result-again').addEventListener('click', () => {
+      initAudioContext();
+      playPopSound();
+      STATE.currentQuestionIndex = 0;
+      STATE.score = 0;
+      STATE.correctCount = 0;
+      STATE.dragBonusCompleted = false;
+      document.getElementById('txt-current-score').textContent = '0';
+
+      showScreen('gameplay');
+      startQuestion();
+    });
+
+    document.getElementById('btn-result-home').addEventListener('click', () => {
+      initAudioContext();
+      playPopSound();
+      showScreen('home');
+    });
+
+    /* Boot Sequence */
+    window.addEventListener('load', () => {
+      applyLocalization();
+      showScreen('home');
+    });
+  </script>
+</body>
+</html>
